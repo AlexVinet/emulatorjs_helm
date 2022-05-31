@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "emulatorjs.fullname" . }}
+  labels:
+    {{- include "emulatorjs.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "emulatorjs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "emulatorjs.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: {{ .Values.timezone }}
+        ports:
+          - name: management
+            containerPort: {{ .Values.service.managementPort }}
+            protocol: TCP
+          - name: webui
+            containerPort: {{ .Values.service.webuiPort }}
+            protocol: TCP
+        volumeMounts:
+        - mountPath: /config
+          name: {{ include "emulatorjs.fullname" . }}-config-pv
+        - mountPath: /data
+          name: {{ include "emulatorjs.fullname" . }}-data-pv
+      volumes:
+      - name: {{ include "emulatorjs.fullname" . }}-config-pv
+        persistentVolumeClaim:
+          claimName: {{ include "emulatorjs.fullname" . }}-config-pvc
+      - name: {{ include "emulatorjs.fullname" . }}-data-pv
+        persistentVolumeClaim:
+          claimName: {{ include "emulatorjs.fullname" . }}-data-pvc

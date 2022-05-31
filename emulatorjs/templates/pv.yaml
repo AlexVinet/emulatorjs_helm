@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "emulatorjs.fullname" . }}-config-pv
+spec:
+  capacity:
+   storage: {{ .Values.storage.configSize }}
+  volumeMode: Filesystem
+  accessModes:
+   - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    name: {{ include "emulatorjs.fullname" . }}-config-pvc
+    namespace: homenet
+  csi:
+    driver: nfs.csi.k8s.io
+    readOnly: false
+    volumeHandle: emulatorjsvolume1  # make sure it's a unique id in the cluster
+    volumeAttributes:
+      server: 192.168.0.151
+      share: /mnt/Local/k8sPersistent/emulatorjs/config/
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "emulatorjs.fullname" . }}-data-pv
+spec:
+  capacity:
+   storage: {{ .Values.storage.dataSize }}
+  volumeMode: Filesystem
+  accessModes:
+   - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    name: {{ include "emulatorjs.fullname" . }}-data-pvc
+    namespace: homenet
+  csi:
+    driver: nfs.csi.k8s.io
+    readOnly: false
+    volumeHandle: emulatorjsvolume2  # make sure it's a unique id in the cluster
+    volumeAttributes:
+      server: 192.168.0.151
+      share: /mnt/Local/k8sPersistent/emulatorjs/data/

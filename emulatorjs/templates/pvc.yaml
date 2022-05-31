@@ -1,0 +1,25 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "emulatorjs.fullname" . }}-config-pvc
+  namespace: homenet
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeName: {{ include "emulatorjs.fullname" . }}-config-pv
+  resources:
+    requests:
+      storage: {{ .Values.storage.configSize }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "emulatorjs.fullname" . }}-data-pvc
+  namespace: homenet
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeName: {{ include "emulatorjs.fullname" . }}-data-pv
+  resources:
+    requests:
+      storage: {{ .Values.storage.dataSize }}

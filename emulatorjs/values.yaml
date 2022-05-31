@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: linuxserver/emulatorjs
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: LoadBalancer
+  managementPort: 3000
+  webuiPort: 80
+
+storage:
+  configSize: 2Gi
+  dataSize: 50Gi
+
+timezone: America/New_York
+
+resources: 
+  requests:
+    cpu: 2
+    memory: 2Gi
+  limits:
+    cpu: 2
+    memory: 2Gi
